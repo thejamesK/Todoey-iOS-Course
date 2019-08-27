@@ -13,8 +13,7 @@ class CategoryViewController: UITableViewController {
     
     let realm = try! Realm()
 
-    var categoryArray = [Category]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var categoryArray: Results<Category>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,10 +24,10 @@ class CategoryViewController: UITableViewController {
     //MARK: - TableView Datasource Methods
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
-        let category = categoryArray[indexPath.row]
         
-        cell.textLabel?.text = category.name
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        
+        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories Added"
         
         
         return cell
@@ -36,7 +35,7 @@ class CategoryViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return categoryArray.count
+        return categoryArray?.count ?? 1
     }
     
     //MARK: - TableView Delegate Methods
@@ -53,7 +52,7 @@ class CategoryViewController: UITableViewController {
         let destinationVC = seague.destination as! TodoListViewController
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedCategory = categoryArray[indexPath.row]
+            destinationVC.selectedCategory = categoryArray?[indexPath.row]
         }
         
     }
@@ -77,15 +76,9 @@ class CategoryViewController: UITableViewController {
     
     func loadCategories() {
         
-//        with request: NSFetchRequest<Category> = Category.fetchRequest()
+        categoryArray = realm.objects(Category.self)
         
-//        do {
-//            categoryArray = try context.fetch(request)
-//        } catch {
-//            print("Error fetching data from context \(error)")
-//        }
-//
-//        tableView.reloadData()
+        tableView.reloadData()
     }
     
     //MARK: - Add New Categories
@@ -97,7 +90,6 @@ class CategoryViewController: UITableViewController {
         let action = UIAlertAction(title: "Add", style: .default) { (action) in
             let newCategory = Category()
             newCategory.name = textField.text!
-            self.categoryArray.append(newCategory)
             
             self.save(category: newCategory)
         }
