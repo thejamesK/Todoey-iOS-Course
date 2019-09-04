@@ -141,7 +141,6 @@ class TodoListViewController : SwipeTableViewController {
     
 }
 
-
     //MARK: - SearchBar Methods
 
 extension TodoListViewController: UISearchBarDelegate {
